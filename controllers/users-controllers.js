@@ -1,14 +1,20 @@
 const HttpError = require('../models/http-error');
+const { validationResult } = require('express-validator');
 const uuid = require('uuid').v4;
 
 let DUMMY_USERS = require('../placeholder/DUMMY_USERS');
 const PORT = 5000;
 
 const getUsers = (req, res, next) => {
-  res.status(200).json({ users: DUMMY_USERS });
+  res.json({ users: DUMMY_USERS });
 };
 
 const createUser = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors.array() });
+  }
+
   const {
     firstName,
     lastName,
@@ -65,10 +71,15 @@ const getUserById = (req, res, next) => {
     return next(new HttpError(`could not find a user with userId: ${userId}`, 404));
   }
 
-  res.status(200).json({ user });
+  res.json({ user });
 };
 
 const updateUser = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors.array() });
+  }
+
   const {
     firstName,
     lastName,
@@ -102,14 +113,14 @@ const updateUser = (req, res, next) => {
 
   DUMMY_USERS[userIndex] = updatedUser;
 
-  res.status(200).json({ user: updatedUser });
+  res.json({ user: updatedUser });
 };
 
 const deleteUser = (req, res, next) => {
   const userId = req.params.userId;
   DUMMY_USERS = DUMMY_USERS.filter(user => user.id !== userId);
 
-  res.status(200).json({ message: `deleted user: ${userId}` });
+  res.json({ message: `deleted user: ${userId}` });
 };
 
 exports.getUsers = getUsers;

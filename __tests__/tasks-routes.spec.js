@@ -65,6 +65,33 @@ describe('users-routes api endpoints', () => {
         done();
       });
   });
+  test('POST /users for duplicate emails should return a status of 422 and the error should contain a message', (done) => {
+    const data = {
+      firstName: 'Alex',
+      lastName: 'Fredin',
+      personNumber: '080321',
+      email: 'alex@outlook.com',
+      phoneNumber: '0708118825',
+      streetAddress_1: 'Lapplandsresan 25B',
+      streetAddress_2: '',
+      postalCode: 75755,
+      city: 'Uppsala',
+      country: 'Sweden',
+      authenticationProvider: '',
+      providerId: '',
+      about: 'Cool kid!'
+    };
+
+    Superagent
+      .post(`${baseUri}/users`)
+      .send(data)
+      .end((error, response) => {
+        expect(error).not.toEqual(null);
+        expect(response.status).toEqual(422);
+        expect('message' in error).toEqual(true);
+        done();
+      });
+  });
   test('GET /users/:userId (new user) should return a 200 status and contain a body with a user property', (done) => {
     Superagent
       .get(`${baseUri}/users/${testVariable}`)

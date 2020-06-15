@@ -25,6 +25,11 @@ const createUser = (req, res, next) => {
     about
   } = req.body;
 
+  const hasUser = DUMMY_USERS.find(user => user.email === email);
+  if (hasUser) {
+    throw new HttpError('Could not create user, email already exists', 422);
+  }
+
   const createdUser = {
     id: uuid(),
     firstName,

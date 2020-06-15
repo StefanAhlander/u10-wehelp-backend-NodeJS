@@ -13,7 +13,9 @@ const updateUserValidators = [
   check('about').trim().escape(),
 ];
 
-const createUserValidators = [...updateUserValidators, check('personNumber').trim().escape().notEmpty(),
+const createUserValidators = [
+  ...updateUserValidators,
+  check('personNumber').trim().escape().notEmpty(),
 ];
 
 module.exports = {

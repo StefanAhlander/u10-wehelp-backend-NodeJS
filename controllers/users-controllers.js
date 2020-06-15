@@ -58,7 +58,7 @@ const createUser = (req, res, next) => {
   DUMMY_USERS.push(createdUser);
 
   res
-    .set({ 'location': `${req.protocol}://${req.hostname}:${PORT}${req.originalUrl}/u3` })
+    .set({ 'location': `${req.protocol}://${req.hostname}:${PORT}${req.originalUrl}/${createdUser.id}` })
     .status(201)
     .json({ user: createdUser });
 };

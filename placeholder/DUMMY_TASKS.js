@@ -1,6 +1,6 @@
 module.exports = [
   {
-    _id: "t1",
+    id: "t1",
     title: "köpa mat",
     category: "handla",
     description: "Jag behöver hjälp med att köpa mat från lokala ICA.",
@@ -8,13 +8,13 @@ module.exports = [
     updatedAt: Date.now(),
     owner: "u1",
     performers: ["u2"],
-    selectedPerformer: null,
-    settled: null,
-    witdrawn: null,
-    rating: null
+    selectedPerformer: "",
+    settled: "",
+    witdrawn: "",
+    rating: ""
   },
   {
-    _id: "t2",
+    id: "t2",
     title: "handla mat",
     category: "handla",
     description: "Jag behöver hjälp med att köpa mat från lokala Coop.",
@@ -22,9 +22,9 @@ module.exports = [
     updatedAt: Date.now(),
     owner: "u1",
     performers: ["u2"],
-    selectedPerformer: null,
-    settled: null,
-    witdrawn: null,
-    rating: null
+    selectedPerformer: "",
+    settled: "",
+    witdrawn: "",
+    rating: ""
   }
 ];

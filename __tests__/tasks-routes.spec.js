@@ -197,4 +197,14 @@ describe('users-routes api endpoints', () => {
         done();
       });
   });
+  test('DELETE /users/:userId for invalid userId should return a 404 status and contain an error with a message property', (done) => {
+    Superagent
+      .delete(`${baseUri}/users/${testVariable}`)
+      .end((error, response) => {
+        expect(error).not.toEqual(null);
+        expect(response.status).toEqual(404);
+        expect("message" in error).toEqual(true);
+        done();
+      });
+  });
 });

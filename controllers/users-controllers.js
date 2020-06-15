@@ -33,7 +33,7 @@ const createUser = (req, res, next) => {
 
   const hasUser = DUMMY_USERS.find(user => user.email === email);
   if (hasUser) {
-    throw new HttpError('Could not create user, email already exists', 422);
+    return next(new HttpError('Could not create user, email already exists', 422));
   }
 
   const createdUser = {
@@ -118,6 +118,11 @@ const updateUser = (req, res, next) => {
 
 const deleteUser = (req, res, next) => {
   const userId = req.params.userId;
+
+  if (!DUMMY_USERS.find(user => user.id === userId)) {
+    return next(new HttpError(`Could not find user ${userId} to delete`, 404));
+  }
+
   DUMMY_USERS = DUMMY_USERS.filter(user => user.id !== userId);
 
   res.json({ message: `deleted user: ${userId}` });

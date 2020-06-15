@@ -1,6 +1,6 @@
 module.exports = [
   {
-    _id: "u1",
+    id: "u1",
     pronoun: "",
     firstName: "Stefan",
     lastName: "Åhlander",
@@ -19,7 +19,7 @@ module.exports = [
     updatedAt: Date.now()
   },
   {
-    _id: "u2",
+    id: "u2",
     pronoun: "",
     firstName: "Maria",
     lastName: "Erlandsson",

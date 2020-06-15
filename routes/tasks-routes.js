@@ -1,16 +1,11 @@
 const express = require('express');
-const DUMMY_TASKS = require('../placeholder/DUMMY_TASKS');
+
+const tasksControllers = require('../controllers/tasks-controllers');
 
 const router = express.Router();
 
-router.get('/', (req, res, next) => {
-  res.json({ tasks: DUMMY_TASKS });
-});
+router.get('/', tasksControllers.getTasks);
 
-router.get('/:taskId', (req, res, next) => {
-  const taskId = req.params.taskId;
-  const task = DUMMY_TASKS.find(task => task._id === taskId);
-  res.json({ task });
-});
+router.get('/:taskId', tasksControllers.getTaskById);
 
 module.exports = router;

@@ -1,18 +1,17 @@
 const express = require('express');
 
+const usersControllers = require('../controllers/users-controllers');
+
 const router = express.Router();
 
-const DUMMY_USERS = require('../placeholder/DUMMY_USERS');
+router.get('/', usersControllers.getUsers);
 
-router.get('/', (req, res, next) => {
-  res.json({ users: DUMMY_USERS });
-});
+router.get('/:userId', usersControllers.getUserById);
 
-router.get('/:userId', (req, res, next) => {
-  const userId = req.params.userId;
-  const user = DUMMY_USERS.find(user => user._id === userId);
-  res.json({ user });
-}
-);
+router.post('/', usersControllers.createUser);
+
+router.patch('/:userId', usersControllers.updateUser);
+
+router.delete('/:userId', usersControllers.deleteUser);
 
 module.exports = router;

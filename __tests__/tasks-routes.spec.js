@@ -18,11 +18,11 @@ describe('tasks-routes api endpoints', () => {
         done();
       });
   });
-  test('GET /tasks/:taskId should return a 404 status and contain a body with an message property when taskId is valid', (done) => {
+  test('GET /tasks/:taskId should return a 404 status and contain a body with an message property when taskId is invalid', (done) => {
     Superagent
       .get(`${baseUri}/tasks/t5`)
       .end((error, response) => {
-        expect(response.status).toEqual(404);
+        expect(response.status).not.toEqual(200);
         expect('message' in error).toEqual(true);
         done();
       });
@@ -43,7 +43,7 @@ describe('tasks-routes api endpoints', () => {
         expect('location' in response.header).toEqual(true);
         expect(response.status).toEqual(201);
         expect(response.body.task.owner).toEqual(data.owner);
-        testVariable = response.body.task.id;
+        testVariable = response.body.task._id;
         done();
       });
   });

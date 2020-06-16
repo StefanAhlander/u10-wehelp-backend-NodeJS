@@ -1,0 +1,26 @@
+module.exports = [
+  {
+    pronoun: "",
+    name: "Stefan Åhlander",
+    personNumber: 730227,
+    email: "cs.ahlander@gmail.com",
+    phoneNumber: "0704979766",
+    streetAddress_1: "Lapplandsresan 25B",
+    streetAddress_2: "",
+    postalCode: 75755,
+    city: "Uppsala",
+    country: "Sweden",
+    about: "Good guy",
+  }, {
+    pronoun: "",
+    name: "Maria Erlandsson",
+    personNumber: 800727,
+    email: "maria_erlandsson@hotmail.com",
+    phoneNumber: "0725100580",
+    streetAddress_1: "Lapplandsresan 25B",
+    streetAddress_2: "",
+    postalCode: 75755,
+    city: "Uppsala",
+    country: "Sweden",
+    about: "Good girl",
+  }];

@@ -2,10 +2,16 @@ const HttpError = require('../models/http-error');
 const { validationResult } = require('express-validator');
 
 const Task = require('../models/Task');
-let DUMMY_TASKS = require('../placeholder/DUMMY_TASKS');
 
 const getTasks = async (req, res, next) => {
-  res.json({ tasks: DUMMY_TASKS });
+  let tasks;
+
+  try {
+    tasks = await Task.find();
+  } catch (error) {
+    return next(new HttpError(`Database error searching for tasks`), 500);
+  }
+  res.json({ tasks: tasks.map(task => task.toObject({ getters: true })) });
 };
 
 const getTaskById = async (req, res, next) => {
@@ -19,10 +25,10 @@ const getTaskById = async (req, res, next) => {
   }
 
   if (!task) {
-    return next(new HttpError(`could not find a task with taskId: ${taskId}`, 404));
+    return next(new HttpError(`Could not find a task with taskId: ${taskId}`, 404));
   }
 
-  res.json({ task });
+  res.json({ task: task.toObject({ getters: true }) });
 };
 
 const createTask = async (req, res, next) => {
@@ -36,7 +42,7 @@ const createTask = async (req, res, next) => {
   const newTask = new Task({ title, category, description, owner });
 
   try {
-    newTask.save();
+    await newTask.save();
   } catch (error) {
     return next(new HttpError('Error saving new task', 500));
   }
@@ -44,7 +50,7 @@ const createTask = async (req, res, next) => {
   res
     .set({ 'location': `${req.protocol}://${req.hostname}:${process.env.APP_PORT}${req.originalUrl}/${newTask.id}` })
     .status(201)
-    .json({ task: newTask.toJSON() });
+    .json({ task: newTask.toObject() });
 };
 
 const updateTask = async (req, res, next) => {
@@ -53,36 +59,52 @@ const updateTask = async (req, res, next) => {
     return res.status(422).json({ errors: errors.array() });
   }
 
-  const {
-    title,
-    category,
-    description
-  } = req.body;
+  const { title, category, description } = req.body;
   const taskId = req.params.taskId;
-  const updatedTask = { ...DUMMY_TASKS.find(task => task.id === taskId) };
-  const taskIndex = DUMMY_TASKS.findIndex(task => task.id === taskId);
+  let task;
 
-  if (taskIndex === -1) {
-    return next(new HttpError(`could not find a user to update with taskId: ${taskId}`, 404));
+  try {
+    task = await Task.findById(taskId);
+  } catch (error) {
+    return next(new HttpError(`Database error finding task: ${taskId} to update`), 500);
   }
 
-  updatedTask.title = title;
-  updatedTask.category = category;
-  updatedTask.description = description;
+  if (!task) {
+    return next(new HttpError(`Could not find a task with taskId: ${taskId} to update`, 404));
+  }
 
-  DUMMY_TASKS[taskIndex] = updatedTask;
+  task.title = title;
+  task.category = category;
+  task.description = description;
 
-  res.json({ task: updatedTask });
+  try {
+    await task.save();
+  } catch (error) {
+    return next(new HttpError(`Database error updating task: ${taskId}`, 500));
+  }
+
+  res.json({ task: task.toObject({ getters: true }) });
 };
 
 const deleteTask = async (req, res, next) => {
   const taskId = req.params.taskId;
+  let task;
 
-  if (!DUMMY_TASKS.find(task => task.id === taskId)) {
-    return next(new HttpError(`Could not find task ${taskId} to delete`, 404));
+  try {
+    task = await Task.findById(taskId);
+  } catch (error) {
+    return next(new HttpError(`Database error finding task: ${taskId} to delete`), 500);
   }
 
-  DUMMY_TASKS = DUMMY_TASKS.filter(task => task.id !== taskId);
+  if (!task) {
+    return next(new HttpError(`Could not find a task with taskId: ${taskId} to delete`, 404));
+  }
+
+  try {
+    await task.remove();
+  } catch (error) {
+    return next(new HttpError(`Database error deleting task: ${taskId}`, 500));
+  }
 
   res.json({ message: `deleted task: ${taskId}` });
 };

@@ -13,9 +13,9 @@ const DB_URL = process.env.DB_URL
 const clearCollection = async (collection, name) => {
   try {
     await collection.deleteMany({});
-    console.log(`cleared ${name} collection`);
+    console.log(`Cleared the ${name} collection`);
   } catch (error) {
-    console.error(`Error clearing ${name} collection`);
+    console.error(`Error clearing the ${name} collection, ${error.message}`);
   }
 };
 
@@ -25,13 +25,12 @@ const seedCollection = async (collection, name, data) => {
 
     try {
       await Item.save();
-      console.log(`saved a new ${name}`);
-    } catch {
-      console.error(`Error saving a new ${name}`);
+      console.log(`Saved a new ${name}`);
+    } catch (error) {
+      console.error(`Error saving a new ${name}, ${error.message}`);
     }
   }
 };
-
 
 const seed = async () => {
   await clearCollection(Task, 'Tasks');

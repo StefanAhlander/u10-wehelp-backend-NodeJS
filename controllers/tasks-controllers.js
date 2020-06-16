@@ -9,7 +9,7 @@ const getTasks = async (req, res, next) => {
   try {
     tasks = await Task.find();
   } catch (error) {
-    return next(new HttpError(`Database error searching for tasks`), 500);
+    return next(new HttpError(`Database error searching for tasks, ${error.message}`), 500);
   }
   res.json({ tasks: tasks.map(task => task.toObject({ getters: true })) });
 };
@@ -21,7 +21,7 @@ const getTaskById = async (req, res, next) => {
   try {
     task = await Task.findById(taskId);
   } catch (error) {
-    return next(new HttpError(`Database error searching for task: ${taskId}`), 500);
+    return next(new HttpError(`Database error searching for task: ${taskId}, ${error.message}`), 500);
   }
 
   if (!task) {
@@ -44,13 +44,13 @@ const createTask = async (req, res, next) => {
   try {
     await newTask.save();
   } catch (error) {
-    return next(new HttpError('Error saving new task', 500));
+    return next(new HttpError(`Error saving new task, ${error.message}`, 500));
   }
 
   res
     .set({ 'location': `${req.protocol}://${req.hostname}:${process.env.APP_PORT}${req.originalUrl}/${newTask.id}` })
     .status(201)
-    .json({ task: newTask.toObject() });
+    .json({ task: newTask.toObject({ getters: true }) });
 };
 
 const updateTask = async (req, res, next) => {
@@ -66,7 +66,7 @@ const updateTask = async (req, res, next) => {
   try {
     task = await Task.findById(taskId);
   } catch (error) {
-    return next(new HttpError(`Database error finding task: ${taskId} to update`), 500);
+    return next(new HttpError(`Database error finding task: ${taskId} to update, ${error.message}`), 500);
   }
 
   if (!task) {
@@ -80,7 +80,7 @@ const updateTask = async (req, res, next) => {
   try {
     await task.save();
   } catch (error) {
-    return next(new HttpError(`Database error updating task: ${taskId}`, 500));
+    return next(new HttpError(`Database error updating task: ${taskId}, ${error.message}`, 500));
   }
 
   res.json({ task: task.toObject({ getters: true }) });
@@ -93,7 +93,7 @@ const deleteTask = async (req, res, next) => {
   try {
     task = await Task.findById(taskId);
   } catch (error) {
-    return next(new HttpError(`Database error finding task: ${taskId} to delete`), 500);
+    return next(new HttpError(`Database error finding task: ${taskId} to delete, ${error.message}`), 500);
   }
 
   if (!task) {
@@ -103,7 +103,7 @@ const deleteTask = async (req, res, next) => {
   try {
     await task.remove();
   } catch (error) {
-    return next(new HttpError(`Database error deleting task: ${taskId}`, 500));
+    return next(new HttpError(`Database error deleting task: ${taskId}, ${error.message}`, 500));
   }
 
   res.json({ message: `deleted task: ${taskId}` });

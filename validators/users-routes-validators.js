@@ -1,8 +1,7 @@
 const { check } = require('express-validator');
 
 const updateUserValidators = [
-  check('firstName').trim().escape().notEmpty(),
-  check('lastName').trim().escape().notEmpty(),
+  check('name').trim().escape().notEmpty(),
   check('email').isEmail().normalizeEmail(),
   check('phoneNumber').trim().escape().notEmpty(),
   check('streetAddress_1').trim().escape(),

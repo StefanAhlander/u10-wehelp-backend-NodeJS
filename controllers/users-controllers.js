@@ -1,34 +1,44 @@
 const HttpError = require('../models/http-error');
 const { validationResult } = require('express-validator');
-const uuid = require('uuid').v4;
 
 const User = require('../models/User');
-let DUMMY_USERS = require('../placeholder/DUMMY_USERS');
 
-const getUsers = (req, res, next) => {
-  res.json({ users: DUMMY_USERS });
+const getUsers = async (req, res, next) => {
+  let users;
+
+  try {
+    users = await User.find();
+  } catch (error) {
+    return next(new HttpError(`Database error searching for users, ${error.message}`), 500);
+  }
+  res.json({ users: users.map(user => user.toObject({ getters: true })) });
 };
 
-const getUserById = (req, res, next) => {
+const getUserById = async (req, res, next) => {
   const userId = req.params.userId;
-  const user = DUMMY_USERS.find(user => user.id === userId);
+  let user;
+
+  try {
+    user = await User.findById(userId);
+  } catch (error) {
+    return next(new HttpError(`Database error searching for user: ${userId}, ${error.message}`), 500);
+  }
 
   if (!user) {
     return next(new HttpError(`could not find a user with userId: ${userId}`, 404));
   }
 
-  res.json({ user });
+  res.json({ user: user.toObject({ getters: true }) });
 };
 
-const createUser = (req, res, next) => {
+const createUser = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).json({ errors: errors.array() });
   }
 
   const {
-    firstName,
-    lastName,
+    name,
     personNumber,
     email,
     phoneNumber,
@@ -37,20 +47,11 @@ const createUser = (req, res, next) => {
     postalCode,
     city,
     country,
-    authenticationProvider,
-    providerId,
     about
   } = req.body;
 
-  const hasUser = DUMMY_USERS.find(user => user.email === email);
-  if (hasUser) {
-    return next(new HttpError('Could not create user, email already exists', 422));
-  }
-
-  const createdUser = {
-    id: uuid(),
-    firstName,
-    lastName,
+  const newUser = new User({
+    name,
     personNumber,
     email,
     phoneNumber,
@@ -59,30 +60,29 @@ const createUser = (req, res, next) => {
     postalCode,
     city,
     country,
-    authenticationProvider,
-    providerId,
-    about,
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
-  };
+    about
+  });
 
-  DUMMY_USERS.push(createdUser);
+  try {
+    await newUser.save();
+  } catch (error) {
+    return next(new HttpError(`Error saving new user, ${error.message}`, 500));
+  }
 
   res
-    .set({ 'location': `${req.protocol}://${req.hostname}:${process.env.APP_PORT}${req.originalUrl}/${createdUser.id}` })
+    .set({ 'location': `${req.protocol}://${req.hostname}:${process.env.APP_PORT}${req.originalUrl}/${newUser.id}` })
     .status(201)
-    .json({ user: createdUser });
+    .json({ user: newUser.toObject({ getters: true }) });
 };
 
-const updateUser = (req, res, next) => {
+const updateUser = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).json({ errors: errors.array() });
   }
 
   const {
-    firstName,
-    lastName,
+    name,
     email,
     phoneNumber,
     streetAddress_1,
@@ -93,37 +93,56 @@ const updateUser = (req, res, next) => {
     about
   } = req.body;
   const userId = req.params.userId;
-  const updatedUser = { ...DUMMY_USERS.find(user => user.id === userId) };
-  const userIndex = DUMMY_USERS.findIndex(user => user.id === userId);
+  let user;
 
-  if (userIndex === -1) {
-    return next(new HttpError(`could not find a user to update with userId: ${userId}`, 404));
+  try {
+    user = await User.findById(userId);
+  } catch (error) {
+    return next(new HttpError(`Database error finding user: ${userId} to update, ${error.message}`), 500);
   }
 
-  updatedUser.firstName = firstName;
-  updatedUser.lastName = lastName;
-  updatedUser.email = email;
-  updatedUser.phoneNumber = phoneNumber;
-  updatedUser.streetAddress_1 = streetAddress_1;
-  updatedUser.streetAddress_2 = streetAddress_2;
-  updatedUser.postalCode = postalCode;
-  updatedUser.city = city;
-  updatedUser.country = country;
-  updatedUser.about = about;
+  if (!user) {
+    return next(new HttpError(`Could not find a user with userId: ${userId} to update`, 404));
+  }
 
-  DUMMY_USERS[userIndex] = updatedUser;
+  user.name = name;
+  user.email = email;
+  user.phoneNumber = phoneNumber;
+  user.streetAddress_1 = streetAddress_1;
+  user.streetAddress_2 = streetAddress_2;
+  user.postalCode = postalCode;
+  user.city = city;
+  user.country = country;
+  user.about = about;
 
-  res.json({ user: updatedUser });
+  try {
+    await user.save();
+  } catch (error) {
+    return next(new HttpError(`Database error updating user: ${userId}, ${error.message}`, 500));
+  }
+
+  res.json({ user: user.toObject({ getters: true }) });
 };
 
-const deleteUser = (req, res, next) => {
+const deleteUser = async (req, res, next) => {
   const userId = req.params.userId;
+  let user;
 
-  if (!DUMMY_USERS.find(user => user.id === userId)) {
-    return next(new HttpError(`Could not find user ${userId} to delete`, 404));
+  try {
+    user = await User.findById(userId);
+  } catch (error) {
+    return next(new HttpError(`Database error finding user: ${userId} to delete, ${error.message}`), 500);
   }
 
-  DUMMY_USERS = DUMMY_USERS.filter(user => user.id !== userId);
+  if (!user) {
+    return next(new HttpError(`Could not find a user with userId: ${userId} to delete`, 404));
+  }
+
+  try {
+    await user.remove();
+  } catch (error) {
+    return next(new HttpError(`Database error deleting user: ${userId}, ${error.message}`, 500));
+  }
 
   res.json({ message: `deleted user: ${userId}` });
 };

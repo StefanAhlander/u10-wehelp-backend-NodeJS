@@ -1,7 +1,8 @@
+require('dotenv').config();
 const Superagent = require('superagent');
 
 const version = require('../package.json').version;
-const baseUri = `http://localhost:5000/api/${version}`;
+const baseUri = `http://localhost:${process.env.APP_PORT}/api/${version}`;
 
 let testVariable;
 

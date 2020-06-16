@@ -2,11 +2,22 @@ const HttpError = require('../models/http-error');
 const { validationResult } = require('express-validator');
 const uuid = require('uuid').v4;
 
+const User = require('../models/User');
 let DUMMY_USERS = require('../placeholder/DUMMY_USERS');
-const PORT = 5000;
 
 const getUsers = (req, res, next) => {
   res.json({ users: DUMMY_USERS });
+};
+
+const getUserById = (req, res, next) => {
+  const userId = req.params.userId;
+  const user = DUMMY_USERS.find(user => user.id === userId);
+
+  if (!user) {
+    return next(new HttpError(`could not find a user with userId: ${userId}`, 404));
+  }
+
+  res.json({ user });
 };
 
 const createUser = (req, res, next) => {
@@ -58,20 +69,9 @@ const createUser = (req, res, next) => {
   DUMMY_USERS.push(createdUser);
 
   res
-    .set({ 'location': `${req.protocol}://${req.hostname}:${PORT}${req.originalUrl}/${createdUser.id}` })
+    .set({ 'location': `${req.protocol}://${req.hostname}:${process.env.APP_PORT}${req.originalUrl}/${createdUser.id}` })
     .status(201)
     .json({ user: createdUser });
-};
-
-const getUserById = (req, res, next) => {
-  const userId = req.params.userId;
-  const user = DUMMY_USERS.find(user => user.id === userId);
-
-  if (!user) {
-    return next(new HttpError(`could not find a user with userId: ${userId}`, 404));
-  }
-
-  res.json({ user });
 };
 
 const updateUser = (req, res, next) => {

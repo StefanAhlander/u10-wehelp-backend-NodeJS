@@ -21,7 +21,7 @@ module.exports = [
     createdAt: Date.now(),
     updatedAt: Date.now(),
     owner: "u1",
-    performers: ["u2"],
+    performers: [],
     selectedPerformer: "",
     settled: "",
     witdrawn: "",

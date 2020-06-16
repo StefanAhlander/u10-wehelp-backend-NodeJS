@@ -1,17 +1,22 @@
 const HttpError = require('../models/http-error');
 const { validationResult } = require('express-validator');
-const uuid = require('uuid').v4;
 
+const Task = require('../models/Task');
 let DUMMY_TASKS = require('../placeholder/DUMMY_TASKS');
-const PORT = 5000;
 
-const getTasks = (req, res, next) => {
+const getTasks = async (req, res, next) => {
   res.json({ tasks: DUMMY_TASKS });
 };
 
-const getTaskById = (req, res, next) => {
+const getTaskById = async (req, res, next) => {
   const taskId = req.params.taskId;
-  const task = DUMMY_TASKS.find(task => task.id === taskId);
+  let task;
+
+  try {
+    task = await Task.findById(taskId);
+  } catch (error) {
+    return next(new HttpError(`Database error searching for task: ${taskId}`), 500);
+  }
 
   if (!task) {
     return next(new HttpError(`could not find a task with taskId: ${taskId}`, 404));
@@ -20,38 +25,29 @@ const getTaskById = (req, res, next) => {
   res.json({ task });
 };
 
-const createTask = (req, res, next) => {
+const createTask = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).json({ errors: errors.array() });
   }
 
-  const {
-    title,
-    category,
-    description,
-    owner
-  } = req.body;
+  const { title, category, description, owner } = req.body;
 
-  const createdTask = {
-    id: uuid(),
-    title,
-    category,
-    description,
-    owner,
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
-  };
+  const newTask = new Task({ title, category, description, owner });
 
-  DUMMY_TASKS.push(createdTask);
+  try {
+    newTask.save();
+  } catch (error) {
+    return next(new HttpError('Error saving new task', 500));
+  }
 
   res
-    .set({ 'location': `${req.protocol}://${req.hostname}:${PORT}${req.originalUrl}/${createdTask.id}` })
+    .set({ 'location': `${req.protocol}://${req.hostname}:${process.env.APP_PORT}${req.originalUrl}/${newTask.id}` })
     .status(201)
-    .json({ task: createdTask });
+    .json({ task: newTask.toJSON() });
 };
 
-const updateTask = (req, res, next) => {
+const updateTask = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).json({ errors: errors.array() });
@@ -67,7 +63,7 @@ const updateTask = (req, res, next) => {
   const taskIndex = DUMMY_TASKS.findIndex(task => task.id === taskId);
 
   if (taskIndex === -1) {
-    return next(new HttpError(`could not find a user to update with taskId: ${userId}`, 404));
+    return next(new HttpError(`could not find a user to update with taskId: ${taskId}`, 404));
   }
 
   updatedTask.title = title;
@@ -79,7 +75,7 @@ const updateTask = (req, res, next) => {
   res.json({ task: updatedTask });
 };
 
-const deleteTask = (req, res, next) => {
+const deleteTask = async (req, res, next) => {
   const taskId = req.params.taskId;
 
   if (!DUMMY_TASKS.find(task => task.id === taskId)) {

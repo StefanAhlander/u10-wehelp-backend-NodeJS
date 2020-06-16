@@ -1,7 +1,9 @@
+require('dotenv').config();
 const Superagent = require('superagent');
+const { slice } = require('../placeholder/DUMMY_TASKS');
 
 const version = require('../package.json').version;
-const baseUri = `http://localhost:5000/api/${version}`;
+const baseUri = `http://localhost:${process.env.APP_PORT}/api/${version}`;
 
 let testVariable;
 
@@ -13,16 +15,6 @@ describe('tasks-routes api endpoints', () => {
         expect(error).toEqual(null);
         expect(response.status).toEqual(200);
         expect('tasks' in response.body).toEqual(true);
-        done();
-      });
-  });
-  test('GET /tasks/:taskId should return a 200 status and contain a body with a user property when taskId is valid', (done) => {
-    Superagent
-      .get(`${baseUri}/tasks/t1`)
-      .end((error, response) => {
-        expect(error).toEqual(null);
-        expect(response.status).toEqual(200);
-        expect('task' in response.body).toEqual(true);
         done();
       });
   });
@@ -48,7 +40,7 @@ describe('tasks-routes api endpoints', () => {
       .send(data)
       .end((error, response) => {
         expect(error).toEqual(null);
-        expect(response.header.location).toEqual(`${baseUri}/tasks/${response.body.task.id}`);
+        expect('location' in response.header).toEqual(true);
         expect(response.status).toEqual(201);
         expect(response.body.task.owner).toEqual(data.owner);
         testVariable = response.body.task.id;

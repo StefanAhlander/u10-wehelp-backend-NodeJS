@@ -53,7 +53,7 @@ describe('users-routes api endpoints', () => {
         done();
       });
   });
-  test('POST /users for duplicate emails should return a status of 500 and the error should contain a message', (done) => {
+  test('POST /users for duplicate emails should return a status of 422 and the error should contain a message', (done) => {
     const data = {
       pronoun: "",
       name: "Alex Fredin",
@@ -73,7 +73,7 @@ describe('users-routes api endpoints', () => {
       .send(data)
       .end((error, response) => {
         expect(error).not.toEqual(null);
-        expect(response.status).toEqual(500);
+        expect(response.status).toEqual(422);
         expect('message' in error).toEqual(true);
         done();
       });

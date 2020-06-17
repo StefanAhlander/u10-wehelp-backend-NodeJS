@@ -37,31 +37,31 @@ const createUser = async (req, res, next) => {
     return res.status(422).json({ errors: errors.array() });
   }
 
-  const {
-    name,
-    personNumber,
-    email,
-    phoneNumber,
-    streetAddress_1,
-    streetAddress_2,
-    postalCode,
-    city,
-    country,
-    about
-  } = req.body;
+  /* Extract properties from the req.body and assign to an object.
+   * 
+   * JSON.stringify only the properties provided in the second argument [array]. 
+   * JSON.parse string back to an object. 
+   */
+  const passedUserInfo = JSON.parse(JSON.stringify(
+    req.body,
+    ['name', 'personNumber', 'email', 'phoneNumber', 'streetAddress_1', 'streetAddress_2', 'postalCode', 'city', 'country', 'about']
+  ));
 
-  const newUser = new User({
-    name,
-    personNumber,
-    email,
-    phoneNumber,
-    streetAddress_1,
-    streetAddress_2,
-    postalCode,
-    city,
-    country,
-    about
-  });
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ email: passedUserInfo.email });
+    if (!existingUser) {
+      existingUser = await User.findOne({ personNumber: passedUserInfo.personNumber });
+    }
+  } catch (error) {
+    return next(new HttpError(`Database error creating user ${error.message}`, 500));
+  }
+
+  if (existingUser) {
+    return next(new HttpError(`Error creating new user`, 422));
+  }
+
+  const newUser = new User(passedUserInfo);
 
   try {
     await newUser.save();
@@ -81,17 +81,10 @@ const updateUser = async (req, res, next) => {
     return res.status(422).json({ errors: errors.array() });
   }
 
-  const {
-    name,
-    email,
-    phoneNumber,
-    streetAddress_1,
-    streetAddress_2,
-    postalCode,
-    city,
-    country,
-    about
-  } = req.body;
+  const updatedInfo = JSON.parse(JSON.stringify(
+    req.body,
+    ['name', 'email', 'phoneNumber', 'streetAddress_1', 'streetAddress_2', 'postalCode', 'city', 'country', 'about']
+  ));
   const userId = req.params.userId;
   let user;
 
@@ -105,15 +98,7 @@ const updateUser = async (req, res, next) => {
     return next(new HttpError(`Could not find a user with userId: ${userId} to update`, 404));
   }
 
-  user.name = name;
-  user.email = email;
-  user.phoneNumber = phoneNumber;
-  user.streetAddress_1 = streetAddress_1;
-  user.streetAddress_2 = streetAddress_2;
-  user.postalCode = postalCode;
-  user.city = city;
-  user.country = country;
-  user.about = about;
+  user = Object.assign(user, updatedInfo);
 
   try {
     await user.save();

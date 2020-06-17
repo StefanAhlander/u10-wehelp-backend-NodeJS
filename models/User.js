@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const uniqueValidator = require('mongoose-unique-validator');
 
 const userSchema = new mongoose.Schema({
   pronoun: { type: String },
@@ -11,9 +12,12 @@ const userSchema = new mongoose.Schema({
   postalCode: { type: Number },
   city: { type: String },
   country: { type: String },
-  about: { type: String }
+  about: { type: String },
+  rating: { type: Number }
 }, {
   timestamps: true
 });
+
+userSchema.plugin(uniqueValidator);
 
 module.exports = mongoose.model('User', userSchema);

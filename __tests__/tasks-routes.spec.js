@@ -1,6 +1,5 @@
 require('dotenv').config();
 const Superagent = require('superagent');
-const { slice } = require('../placeholder/DUMMY_TASKS');
 
 const version = require('../package.json').version;
 const baseUri = `http://localhost:${process.env.APP_PORT}/api/${version}`;
@@ -79,7 +78,7 @@ describe('tasks-routes api endpoints', () => {
     const data = {
       title: 'Need help Cleaning',
       category: 'Houshold choirs',
-      description: 'I need help cleaning my appartment'
+      description: 'I need help cleaning my vacation home'
     };
 
     Superagent

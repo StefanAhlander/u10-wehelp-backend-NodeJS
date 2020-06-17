@@ -37,9 +37,17 @@ const createTask = async (req, res, next) => {
     return res.status(422).json({ errors: errors.array() });
   }
 
-  const { title, category, description, owner } = req.body;
+  /* Extract properties from the req.body and assign to an object.
+   * 
+   * JSON.stringify only the properties provided in the second argument [array]. 
+   * JSON.parse string back to an object. 
+   */
+  const passedTaskInfo = JSON.parse(JSON.stringify(
+    req.body,
+    ['title', 'category', 'description', 'owner']
+  ));
 
-  const newTask = new Task({ title, category, description, owner });
+  const newTask = new Task(passedTaskInfo);
 
   try {
     await newTask.save();
@@ -59,7 +67,10 @@ const updateTask = async (req, res, next) => {
     return res.status(422).json({ errors: errors.array() });
   }
 
-  const { title, category, description } = req.body;
+  const updatedInfo = JSON.parse(JSON.stringify(
+    req.body,
+    ['title', 'category', 'description']
+  ));
   const taskId = req.params.taskId;
   let task;
 
@@ -73,9 +84,7 @@ const updateTask = async (req, res, next) => {
     return next(new HttpError(`Could not find a task with taskId: ${taskId} to update`, 404));
   }
 
-  task.title = title;
-  task.category = category;
-  task.description = description;
+  task = Object.assign(task, updatedInfo);
 
   try {
     await task.save();

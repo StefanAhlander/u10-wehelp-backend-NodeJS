@@ -1,5 +1,9 @@
 {
   "name": "u10-wehelp-backend",
+  "jest": {
+    "testEnvironment": "node",
+    "verbose": true
+  },
   "version": "1.0.0",
   "description": "Backend API for the We Help application",
   "main": "app.js",

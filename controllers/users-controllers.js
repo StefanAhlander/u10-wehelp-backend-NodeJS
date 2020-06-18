@@ -7,7 +7,7 @@ const getUsers = async (req, res, next) => {
   let users;
 
   try {
-    users = await User.find();
+    users = await User.find({}, '-password');
   } catch (error) {
     return next(new HttpError(`Database error searching for users, ${error.message}`), 500);
   }

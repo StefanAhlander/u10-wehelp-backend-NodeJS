@@ -38,6 +38,7 @@ const seed = async () => {
   await seedCollection(User, 'user', userData);
   await seedCollection(Task, 'task', taskData);
   mongoose.connection.close();
+  console.log(`Connection to database closed`);
 };
 
 mongoose

@@ -2,6 +2,7 @@ const HttpError = require('../models/http-error');
 const { validationResult } = require('express-validator');
 
 const Task = require('../models/Task');
+const User = require('../models/User');
 
 const getTasks = async (req, res, next) => {
   let tasks;
@@ -46,6 +47,8 @@ const createTask = async (req, res, next) => {
     req.body,
     ['title', 'category', 'description', 'owner']
   ));
+
+  // TODO: Check if owner exist in the db, if not exit with 404
 
   const newTask = new Task(passedTaskInfo);
 

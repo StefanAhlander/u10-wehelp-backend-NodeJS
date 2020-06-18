@@ -1,5 +1,6 @@
 require('dotenv').config();
 const Superagent = require('superagent');
+const mongoose = require('mongoose');
 
 const version = require('../package.json').version;
 const baseUri = `http://localhost:${process.env.APP_PORT}/api/${version}`;
@@ -31,7 +32,7 @@ describe('tasks-routes api endpoints', () => {
       title: 'Help shopping',
       category: 'Shopping',
       description: 'I need help buying groceries from the local ICA',
-      owner: 'u2'
+      owner: mongoose.Types.ObjectId()
     };
 
     Superagent
@@ -41,7 +42,7 @@ describe('tasks-routes api endpoints', () => {
         expect(error).toEqual(null);
         expect('location' in response.header).toEqual(true);
         expect(response.status).toEqual(201);
-        expect(response.body.task.owner).toEqual(data.owner);
+        expect(response.body.task.title).toEqual(data.title);
         testVariable = response.body.task._id;
         done();
       });

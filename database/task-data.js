@@ -1,15 +1,17 @@
+const mongoose = require('mongoose');
+
 module.exports = [
   {
     title: "köpa mat",
     category: "handla",
     description: "Jag behöver hjälp med att köpa mat från lokala ICA.",
-    owner: "u1",
-    performers: ["u2"],
+    owner: mongoose.Types.ObjectId(),
+    performers: [mongoose.Types.ObjectId(), mongoose.Types.ObjectId()],
   }, {
     title: "handla mat",
     category: "handla",
     description: "Jag behöver hjälp med att köpa mat från lokala Coop.",
-    owner: "u1",
+    owner: mongoose.Types.ObjectId(),
     performers: [],
   }
 ];

@@ -55,15 +55,27 @@ app.use((error, req, res, next) => {
 });
 
 // Start Mongoose and server
-mongoose
-  .connect(DB_URL, {
-    useUnifiedTopology: true,
-    useNewUrlParser: true
-  })
-  .then(() => {
-    app.listen(process.env.APP_PORT);
+const boot = async (port) => {
+  try {
+    await mongoose.connect(DB_URL, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true
+    });
+    app.listen(port);
     console.log(`\n<<<###\nConnected to database at: ${new Date()}\n`);
-  })
-  .catch(error => {
+  } catch (error) {
     throw error;
-  });
+  }
+};
+
+const shutdown = () => {
+  mongoose.connection.close();
+};
+
+if (require.main === module) {
+  boot(process.env.APP_PORT);
+} else {
+  console.log('Running app as module');
+  exports.boot = boot;
+  exports.shutdown = shutdown;
+}

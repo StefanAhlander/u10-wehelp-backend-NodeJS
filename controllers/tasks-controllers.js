@@ -15,6 +15,7 @@ const getTasks = async (req, res, next) => {
   res.json({ tasks: tasks.map(task => task.toObject({ getters: true })) });
 };
 
+
 const getTaskById = async (req, res, next) => {
   const taskId = req.params.taskId;
   let task;
@@ -32,6 +33,7 @@ const getTaskById = async (req, res, next) => {
   res.json({ task: task.toObject({ getters: true }) });
 };
 
+
 const createTask = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -45,10 +47,10 @@ const createTask = async (req, res, next) => {
    */
   const passedTaskInfo = JSON.parse(JSON.stringify(
     req.body,
-    ['title', 'category', 'description', 'owner']
+    ['title', 'category', 'description']
   ));
 
-  // TODO: Check if owner exist in the db, if not exit with 404
+  passedTaskInfo.owner = req.userData.userId;
 
   const newTask = new Task(passedTaskInfo);
 
@@ -63,6 +65,7 @@ const createTask = async (req, res, next) => {
     .status(201)
     .json({ task: newTask.toObject({ getters: true }) });
 };
+
 
 const updateTask = async (req, res, next) => {
   const errors = validationResult(req);
@@ -87,6 +90,10 @@ const updateTask = async (req, res, next) => {
     return next(new HttpError(`Could not find a task with taskId: ${taskId} to update`, 404));
   }
 
+  if (task.owner.toString() !== req.userData.userId) {
+    return next(new HttpError(`You are not allowed to update this task`, 401));
+  }
+
   task = Object.assign(task, updatedInfo);
 
   try {
@@ -97,6 +104,7 @@ const updateTask = async (req, res, next) => {
 
   res.json({ task: task.toObject({ getters: true }) });
 };
+
 
 const deleteTask = async (req, res, next) => {
   const taskId = req.params.taskId;
@@ -110,6 +118,10 @@ const deleteTask = async (req, res, next) => {
 
   if (!task) {
     return next(new HttpError(`Could not find a task with taskId: ${taskId} to delete`, 404));
+  }
+
+  if (task.owner.toString() !== req.userData.userId) {
+    return next(new HttpError(`You are not allowed to delete this task`, 401));
   }
 
   try {

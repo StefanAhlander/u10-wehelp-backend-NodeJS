@@ -1,7 +1,6 @@
 require('dotenv').config();
 const Superagent = require('superagent');
 const mongoose = require('mongoose');
-var tcpPortUsed = require('tcp-port-used');
 
 const { boot, shutdown } = require('../app');
 
@@ -13,7 +12,7 @@ let testVariable;
 
 beforeAll((done) => {
   boot(port);
-  done();
+  setTimeout(done, 2500);
 });
 
 describe('tasks-routes api endpoints', () => {

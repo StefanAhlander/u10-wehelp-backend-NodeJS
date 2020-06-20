@@ -4,6 +4,7 @@ const Task = require('../models/Task');
 const User = require('../models/User');
 const taskData = require('./task-data');
 const userData = require('./user-data');
+const bcrypt = require('bcryptjs');
 
 const userIdArray = [];
 
@@ -25,6 +26,11 @@ const clearCollection = async (collection, name) => {
 
 const seedCollection = async (collection, name, data) => {
   for (const item of data) {
+    if (name === 'user') {
+      const hashedPassword = await bcrypt.hash(item.password, 12);
+      item.password = hashedPassword;
+    }
+
     const Item = new collection(item);
 
     if (name === 'user') {

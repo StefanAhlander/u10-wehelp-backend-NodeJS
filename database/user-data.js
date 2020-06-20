@@ -11,6 +11,7 @@ module.exports = [
     city: "Uppsala",
     country: "Sweden",
     about: "Good guy",
+    password: 'testing'
   }, {
     pronoun: "",
     name: "Maria Erlandsson",
@@ -23,6 +24,7 @@ module.exports = [
     city: "Uppsala",
     country: "Sweden",
     about: "Good girl",
+    password: 'testing'
   }, {
     pronoun: "",
     name: "Magnus Asp",
@@ -35,6 +37,7 @@ module.exports = [
     city: "Uppsala",
     country: "Sweden",
     about: "",
+    password: 'testing'
   }, {
     pronoun: "",
     name: "Gio Garcis",
@@ -47,6 +50,7 @@ module.exports = [
     city: "Uppsala",
     country: "Sweden",
     about: "Boxer boy",
+    password: 'testing'
   }, {
     pronoun: "",
     name: "Jonas Andersson",
@@ -59,4 +63,5 @@ module.exports = [
     city: "Uppsala",
     country: "Sweden",
     about: "Daddy Dj",
+    password: 'testing'
   }];

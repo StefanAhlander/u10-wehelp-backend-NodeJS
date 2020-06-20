@@ -13,7 +13,8 @@ const userSchema = new mongoose.Schema({
   city: { type: String },
   country: { type: String },
   about: { type: String },
-  rating: { type: Number }
+  rating: { type: Number },
+  password: { type: String, required: true }
 }, {
   timestamps: true
 });

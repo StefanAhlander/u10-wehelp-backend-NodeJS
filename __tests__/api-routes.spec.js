@@ -5,13 +5,13 @@ const mongoose = require('mongoose');
 const { boot, shutdown } = require('../app');
 
 const version = require('../package.json').version;
-const port = +process.env.APP_PORT + 1;
+const PORT = +process.env.DEV_PORT + 1;
 const baseUri = `http://localhost:${port}/api/${version}`;
 
 let testVariable;
 
 beforeAll((done) => {
-  boot(port);
+  boot(PORT);
   setTimeout(done, 2500);
 });
 

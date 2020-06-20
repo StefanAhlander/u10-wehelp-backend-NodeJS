@@ -73,7 +73,7 @@ const shutdown = () => {
 };
 
 if (require.main === module) {
-  boot(process.env.APP_PORT);
+  boot(process.env.PORT || process.env.DEV_PORT);
 } else {
   console.log('Running app as module');
   exports.boot = boot;

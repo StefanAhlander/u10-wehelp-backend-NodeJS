@@ -75,7 +75,7 @@ const updateTask = async (req, res, next) => {
 
   const updatedInfo = JSON.parse(JSON.stringify(
     req.body,
-    ['title', 'category', 'description']
+    ['title', 'category', 'description', 'settled']
   ));
   const taskId = req.params.taskId;
   let task;
@@ -133,8 +133,69 @@ const deleteTask = async (req, res, next) => {
   res.json({ message: `deleted task: ${taskId}` });
 };
 
+
+const getTasksByOwner = async (req, res, next) => {
+  const userId = req.params.userId;
+  let tasks;
+
+  try {
+    tasks = await Task.find({ owner: userId });
+  } catch (error) {
+    return next(new HttpError(`Database error searching for tasks owned by: ${userId}, ${error.message}`), 500);
+  }
+
+  if (!tasks) {
+    return next(new HttpError(`Could not find any tasks owned by user: ${userId}`, 404));
+  }
+
+  res.json({ tasks: tasks.map(task => task.toObject({ getters: true })) });
+};
+
+const getTasksByPerformer = async (req, res, next) => {
+  const userId = req.params.userId;
+  let tasks;
+
+  try {
+    tasks = await Task.find({ selectedPerformer: userId });
+  } catch (error) {
+    return next(new HttpError(`Database error searching for tasks where: ${userId} is selected as performer, ${error.message}`), 500);
+  }
+
+  if (!tasks) {
+    return next(new HttpError(`Could not find any tasks to be performed by user: ${userId}`, 404));
+  }
+
+  res.json({ tasks: tasks.map(task => task.toObject({ getters: true })) });
+};
+
+const getFinishedTasksByOwner = async (req, res, next) => {
+  const userId = req.params.userId;
+  let tasks;
+
+  try {
+    tasks = await Task.find({
+      selectedPerformer: userId,
+      settled: {
+        $lte: new Date()
+      }
+    });
+  } catch (error) {
+    return next(new HttpError(`Database error searching for tasks finished by: ${userId}, ${error.message}`), 500);
+  }
+
+  if (!tasks) {
+    return next(new HttpError(`Could not find any tasks finished by user: ${userId}`, 404));
+  }
+
+  res.json({ tasks: tasks.map(task => task.toObject({ getters: true })) });
+};
+
+
 exports.getTasks = getTasks;
 exports.getTaskById = getTaskById;
 exports.createTask = createTask;
 exports.updateTask = updateTask;
 exports.deleteTask = deleteTask;
+exports.getTasksByOwner = getTasksByOwner;
+exports.getTasksByPerformer = getTasksByPerformer;
+exports.getFinishedTasksByOwner = getFinishedTasksByOwner;

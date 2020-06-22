@@ -11,6 +11,12 @@ router.get('/', tasksControllers.getTasks);
 
 router.get('/:taskId', tasksControllers.getTaskById);
 
+router.get('/user/:userId/owner', tasksControllers.getTasksByOwner);
+
+router.get('/user/:userId/performer', tasksControllers.getTasksByPerformer);
+
+router.get('/user/:userId/finished', tasksControllers.getFinishedTasksByOwner);
+
 router.use(checkAuth);
 
 router.post('/', createTaskValidators, tasksControllers.createTask);

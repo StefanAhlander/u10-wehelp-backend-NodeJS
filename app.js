@@ -63,6 +63,7 @@ const boot = async (port) => {
     });
     app.listen(port);
     console.log(`\n<<<###\nConnected to database at: ${new Date()}\n`);
+    console.log(`Server listening on port ${port}\n`);
   } catch (error) {
     throw error;
   }

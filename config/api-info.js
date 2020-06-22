@@ -19,6 +19,6 @@ module.exports = {
   "delete <baseUri>/tasks/:id": "delete task, authentication and authorization required",
 
   "get <baseUri>/tasks/user/:id/owner": "get all tasks that a user has created",
-  "get <baseUri>/tasks/user/:id/performer": "get all tasks that a user has accepted to do",
+  "get <baseUri>/tasks/user/:id/performer": "get all tasks that a user has been selected to do",
   "get <baseUri>/tasks/user/:id/finished": "get all tasks that a user has finished"
 };

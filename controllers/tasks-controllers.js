@@ -11,6 +11,7 @@ const getTasks = async (req, res, next) => {
   } catch (error) {
     return next(new HttpError(`Database error searching for tasks, ${error.message}`), 500);
   }
+
   res.json({ tasks: tasks.map(task => task.toObject({ getters: true })) });
 };
 
